@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset = "utf-8">
+	<title>Hotels</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+	{% include 'includes/_navbar.html' %}
+	<br/>
+	<br/><br/>
+	<main role="main" class="container">
+		<div class="jumbotron">
+			{% include 'includes/_messages.html' %}
+			{% block body %}{% endblock %}
+			
+		</div>
+	</main>
+	
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	<script src="https://cdn.ckeditor.com/4.9.1/standard/ckeditor.js"></script>
+
+	<script type="text/javascript">
+		CKEDITOR.replace('editor')
+	</script>
+	
+</body>
+</html>

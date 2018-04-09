@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<h1>Dashboard <small> Welcome {{session.username}}</small></h1>
+
+	<a class="btn btn-success" href="/add_amenity">Add a Hotel Facility</a>
+	<hr>
+
+	<table class="table table-striped">
+		<tr>
+			<th>ID</th>
+			<th>Title</th>
+			<th>Author</th>
+			<th>Date</th>
+			<th></th>
+			<th></th>
+		</tr>
+		
+		{% for amenity in amenities %}
+		<tr>
+			<td>{{amenity.a_id}}</td>
+			<td>{{amenity.a_title}}</td>
+
+			<td><a href="edit_amenity/{{amenity.a_id}}" class="btn btn-default pull-right">Edit</a></td>
+			<td><a href="delete_amenity/{{amenity.a_id}}" class="btn btn-danger">Delete</a></td>
+			
+		</tr>
+		{% endfor %}
+	</table>
+{% endblock %}

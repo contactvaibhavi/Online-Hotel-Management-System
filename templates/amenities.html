@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<h1>Facilities available</h1>
+	<table class="table table-striped">
+		<tr>
+			<th>ID</th>
+			<th>Title</th>
+			<th>Type</th>
+			<th>Status</th>
+			<th>Capacity</th>
+			<th></th>
+		</tr>
+		
+		{% for amenity in amenities %}
+		<tr>
+			<td>{{amenity.a_id}}</td>
+			<td><a href="view_amenity/{{amenity.a_id}}" class="btn btn-default pull-right">{{amenity.a_title}}</a></td>
+			<td>{{amenity.a_type}}</td>
+			<td>{{amenity.a_status}}</td>
+			<td>{{amenity.a_capacity}}</td>
+
+			{% if amenity.a_status == 0 %}
+			<td><a href="bookings" class="btn btn-success">    Book     </a></td>
+			{% else %}
+			<td><a href="#" class="btn btn-danger">Not Available</a></td>
+			{% endif %}
+
+		</tr>
+		{% endfor %}
+	</table>
+
+{% endblock %}

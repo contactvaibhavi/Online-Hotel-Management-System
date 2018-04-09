@@ -1,0 +1,43 @@
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <a class="navbar-brand" href="/">Hotel Management System</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/about">About</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/amenities">Facilities</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/rooms">Rooms</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/bookings">Bookings</a>
+          </li>
+
+        </ul>
+
+        {% if session.logged_in %}
+          <li class="nav-item"><a class="nav-item" href="/dashboard">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+          {% else %}
+          <li class="nav-item"><a href="/register">Registration</a></li>
+          
+          <li class="nav-item"><a href="/login">Admin Login</a></li>
+          {% endif %}
+
+     
+        
+       </div>
+    </nav>
