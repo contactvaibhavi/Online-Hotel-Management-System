@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<h1>Rooms available</h1>
+	<table class="table table-striped">
+		<tr>
+			<th>ID</th>
+			<th>Number</th>
+			<th>Type</th>
+			<th>Status</th>
+			<th>Capacity</th>
+			<th></th>
+		</tr>
+		
+		{% for room in rooms %}
+		<tr>
+			<td>{{room.r_id}}</td>
+			<td>{{room.r_number}}</td>
+			<td>{{room.r_type}}</td>
+			<td>{{room.r_status}}</td>
+			<td>{{room.r_capacity}}</td>
+
+			{% if room.r_status == 0 %}
+			<td><a href="bookings/{{room.r_id}}" class="btn btn-success" method="POST">    Book     </a></td>
+			{% else %}
+			<td><a href="#" class="btn btn-danger">Not Available</a></td>
+			{% endif %}
+
+		</tr>
+		{% endfor %}
+	</table>
+
+{% endblock %}

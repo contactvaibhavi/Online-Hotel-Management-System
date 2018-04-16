@@ -48,6 +48,20 @@ def amenities():
 
     cur.close()
 
+@app.route('/rooms')
+def rooms():
+    cur = mysql.connection.cursor()
+
+    result = cur.execute("SELECT * FROM rooms")
+
+    rooms = cur.fetchall()
+
+    if result > 0:
+        return render_template('rooms.html', rooms=rooms)
+    else:
+        msg = 'No rooms available currently'
+        return render_template('rooms.html', msg=msg)
+
 @app.route('/view_amenity/<string:id>/')
 def view_amenity(id):
     cur = mysql.connection.cursor()
@@ -419,7 +433,11 @@ def bookings(id):
 
     cur = mysql.connection.cursor()
     
-    result = cur.execute("SELECT * FROM amenities WHERE a_id=%s", [id])
+    if id[0] == 'R':
+        result = cur.execute("SELECT * FROM rooms WHERE r_id=%s", [id])
+    else:
+        result = cur.execute("SELECT * FROM amenities WHERE a_id=%s", [id])
+    
     amenity = cur.fetchone()
 
     form = BookingForm()
@@ -453,9 +471,62 @@ def bookings(id):
 
         flash('Successfully Booked!', 'success')
 
-        return redirect(url_for('bookings'))
+        return redirect(url_for('bookings', id=id))
 
-    return render_template('bookings.html', amenity=amenity, form=form)  
+    return render_template('bookings.html', amenity=amenity, id=id, form=form)  
+
+@app.route('/admin_guests')
+def admin_guests():
+    
+    cur = mysql.connection.cursor()
+
+    result = cur.execute("SELECT * FROM guests")
+
+    guests = cur.fetchall()
+
+    if result > 0:
+        return render_template('guests.html', guests=guests)
+    else:
+        msg = 'No guests in the Hotel currently'
+        return render_template('guests.html', msg=msg)
+
+    return render_template('guests.html')
+
+class BillForm(Form):
+    id = StringField('Guest ID', [validators.Length(min=1, max=5)])
+
+@app.route('/generate_bill/<string:id>')
+def generate_bill(id):
+    cur = mysql.connection.cursor()
+
+    result = cur.execute("SELECT * FROM bookings WHERE  g_id = %s", [id])
+
+    bookings = cur.fetchall()
+
+    result = cur.execute("SELECT * FROM guests WHERE g_id = %s", [id])
+
+    guest = cur.fetchone()
+
+    rendered = render_template('generate_bill.html', guest=guest, bookings=bookings)
+    pdf = pdfkit.from_string(rendered, False)
+
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=output.pdf'
+
+    return response
+
+
+@app.route('/billings', methods=['GET', 'POST'])
+def billings():
+    form = BillForm()
+
+    if request.method == 'POST':
+        id = form.id.data
+        print(id)
+        return redirect(url_for('generate_bill', id=id))
+    return render_template('billings.html', form=form)
+
 
 @app.route('/<name>/<location>')
 def pdf_template(name, location):
@@ -476,7 +547,6 @@ def pdf_template(name, location):
         to=myPhone,
         from_=TwilioNumber,
         body='I sent a text message from twilio! ' + u'\U0001f680')
-
 
     return response
 

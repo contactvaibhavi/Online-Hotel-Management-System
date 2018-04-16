@@ -1,15 +1,49 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-	<h1>{{amenity.a_title}}</h1>
-	<small><p style="display: inline">	<strong>ID:</strong>	{{amenity.a_id}}</p></small>
-	<small><p style="display: inline">	<strong>Type:</strong>	{{amenity.a_type}}</p></small>
-	<small><p style="display: inline">	<strong>Capacity:</strong>	{{amenity.a_capacity}}</p></small>
-	<small><p style="display: inline">	<strong>Status:</strong>	{{amenity.a_status}}</p></small>
+	<h1>
+	{% if id[0] == 'R' %}
+		{{amenity.r_id}}
+		{% else %}
+		{{amenity.a_title}}
+		{% endif %}
+	</h1>
+
+	<small><p style="display: inline">	<strong>ID:</strong>	
+		{% if id[0] == 'R' %}
+		{{amenity.r_number}}
+		{% else %}
+		{{amenity.a_id}}
+		{% endif %}
+	</p></small>
+
+	<small><p style="display: inline">	<strong>Type:</strong>	
+		{% if id[0] == 'R' %}
+		{{amenity.r_type}}
+		{% else %}
+		{{amenity.a_type}}
+		{% endif %}
+	</p></small>
+	
+	<small><p style="display: inline">	<strong>Capacity:</strong>	
+		{% if id[0] == 'R' %}
+		{{amenity.r_capacity}}
+		{% else %}
+		{{amenity.a_capacity}}
+		{% endif %}
+	</p></small>
+
+	<small><p style="display: inline">	<strong>Status:</strong>
+		{% if id[0] == 'R' %}
+		{{amenity.r_status}}
+		{% else %}
+		{{amenity.a_status}}
+		{% endif %}
+	</p></small>
 
 	<hr>
 	{% from "includes/_formhelpers.html" import render_field %}
-	<form method="post" action="/bookings/{{amenity.a_id}}">
+	<form method="post" action="">
 		<p style="display: inline">Check-in &nbsp;</p>
 		{{ form.hidden_tag() }}
 		{{ form.check_in(class='dtpick') }}

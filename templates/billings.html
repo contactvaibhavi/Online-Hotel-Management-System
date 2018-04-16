@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<h1>Generate Bill for Guest</h1>
+
+	{% from "includes/_formhelpers.html" import render_field %}
+	<form method="POST" action="">
+		<div class="form-group">
+			{{render_field(form.id, class_="form-control")}}
+		</div>
+
+		<p><input type="submit" class="btn btn-success" value="Generate Bill"></p>
+	</form>
+{% endblock %}

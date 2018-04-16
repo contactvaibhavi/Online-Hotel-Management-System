@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<h1>Guests in the Hotel </h1>
+	<table class="table table-striped">
+		<tr>
+			<th>ID</th>
+			<th>Name</th>
+			<th>Email</th>
+			<th>Count of occupants</th>
+			<th>Street Address</th>
+			<th>City</th>
+			<th>State</th>
+			<th>Country</th>
+			<th>Pincode</th>
+			<th></th>
+		</tr>
+		
+		{% for guest in guests %}
+		<tr>
+			<td>{{guest.g_id}}</td>
+			<td>{{guest.g_name}}</td>
+			<td>{{guest.g_email}}</td>
+			<td>{{guest.g_count}}</td>
+			<td>{{guest.g_streetno | safe}}</td>
+			<td>{{guest.g_city}}</td>
+			<td>{{guest.g_state}}</td>
+			<td>{{guest.g_country}}</td>
+			<td>{{guest.g_pincode}}</td>
+
+			<td><a href="view_bookings/{{guest.g_id}}" class="btn btn-success" method="POST">    View Bookings     </a></td>
+
+		</tr>
+		{% endfor %}
+	</table>
+
+{% endblock %}
