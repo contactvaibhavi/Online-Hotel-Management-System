@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<h1>Add a Room</h1>
+
+	{% from "includes/_formhelpers.html" import render_field %}
+	<form method="POST" action="">
+		<div class="form-group">
+			{{render_field(form.id, class_="form-control")}}
+		</div>
+
+		<div class="form-group">
+			{{render_field(form.number, class_="form-control")}}
+		</div>
+
+		<div class="form-group">
+			{{render_field(form.type, class_="form-control")}}
+		</div>
+
+		<div class="form-group">
+			{{render_field(form.status, class_="form-control")}}
+		</div>
+
+		<div class="form-group">
+			{{render_field(form.capacity, class_="form-control")}}
+		</div>	
+
+		<p><input type="submit" class="btn btn-primary" value="Add"></p>
+	</form>
+{% endblock %}

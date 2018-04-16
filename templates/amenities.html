@@ -21,7 +21,7 @@
 			<td>{{amenity.a_capacity}}</td>
 
 			{% if amenity.a_status == 0 %}
-			<td><a href="bookings" class="btn btn-success">    Book     </a></td>
+			<td><a href="bookings/{{amenity.a_id}}" class="btn btn-success" method="POST">    Book     </a></td>
 			{% else %}
 			<td><a href="#" class="btn btn-danger">Not Available</a></td>
 			{% endif %}

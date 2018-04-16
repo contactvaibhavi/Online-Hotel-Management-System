@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<form action="" method='post'>
+	{{ form.hidden_tag() }}
+	{{ form.dt(class='dtpick') }}
+	
+	<button class="btn btn-succes" type="submit">Book</button>
+</form>
+{% endblock %}

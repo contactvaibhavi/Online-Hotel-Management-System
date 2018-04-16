@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<h1>Rooms <small> Welcome {{session.username}}</small></h1>
+
+	<a class="btn btn-success" href="/add_room">Add a Room</a>
+	<a class="btn btn-success" href="/add_room">Show only  a Hotel Facility</a>
+	<a class="btn btn-success" href="/add_room">Add a Hotel Facility</a>
+
+	<hr>
+
+	<table class="table table-striped">
+		<tr>
+			<th>ID</th>
+			<th>Type</th>
+			<th>Status</th>
+			<th>Capacity</th>
+			<th></th>
+			<th></th>
+			<th></th>
+		</tr>
+		
+		{% for room in rooms %}
+		<tr>
+			<td>{{room.r_id}}</td>
+			<td>{{room.r_type}}</td>
+			<td>{{room.r_status}}</td>
+			<td>{{room.r_capacity}}</td>
+
+			<td><a href="edit_room/{{room.r_id}}" class="btn btn-default pull-right">Edit</a></td>
+			<td><a href="delete_room/{{room.r_id}}" class="btn btn-danger">Delete</a></td>
+
+			
+		</tr>
+		{% endfor %}
+	</table>
+{% endblock %}

@@ -1,9 +1,13 @@
-from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
-#from data import Articles
+from flask import Flask, render_template, make_response, flash, redirect, url_for, session, request, logging
+import random
 from flask_mysqldb import MySQL
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from flask_wtf import Form
+from wtforms import DateField, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 from functools import wraps
+import pdfkit
+from twilio.rest import Client
+from datetime import date
 
 app = Flask(__name__)
 
@@ -169,6 +173,11 @@ def logout():
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/admin_amenities')
+@is_logged_in
+def admin_amenities():
     cur = mysql.connection.cursor()
 
     result = cur.execute("SELECT * FROM amenities")
@@ -176,13 +185,13 @@ def dashboard():
     amenities = cur.fetchall()
 
     if result > 0:
-        return render_template('dashboard.html', amenities=amenities)
+        return render_template('admin_amenities.html', amenities=amenities)
     else:
-        masg = 'No Facilities available'
+        msg = 'No Facilities available'
         return render_template('dashboard.html', msg=msg)
 
     cur.close()
-    return render_template('dashboard.html')
+    return render_template('admin_amenities.html')
 
 class AmenityForm(Form):
     id = StringField('ID', [validators.Length(min=3, max=5)])
@@ -216,7 +225,7 @@ def add_amenity():
 
         flash('Facility Added Successfully', 'success')
 
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('add_amenity'))
 
     return render_template('add_amenity.html', form=form)
 
@@ -254,7 +263,7 @@ def edit_amenity(id):
 
         flash('Facility Updated successfully', 'success')
 
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('edit_amenity'))
 
     return render_template('edit_amenity.html', form=form)
 
@@ -271,12 +280,207 @@ def delete_amenity(id):
 
     flash('Facility Deleted', 'success')
 
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('admin_amenities'))
 
-@app.route('/bookings', methods=['GET', 'POST'])
-def bookings():
-    return render_template('bookings.html')
+@app.route('/admin_rooms')
+@is_logged_in
+def admin_rooms():
+    cur = mysql.connection.cursor()
+
+    result = cur.execute("SELECT * FROM rooms")
+
+    rooms = cur.fetchall()
+
+    if result > 0:
+        return render_template('admin_rooms.html', rooms=rooms)
+    else:
+        flash('No Rooms available!', 'danger')
+        redirect(url_for('add_room'))
+
+    cur.close()
+    return render_template('admin_rooms.html')
+
+class RoomForm(Form):
+    id = StringField('ID', [validators.Length(min=3, max=5)])
+    number = StringField('Room Number', [validators.Length(min=1, max=3)])
+    type = StringField('Type', [validators.Length(min=1, max=1)])
+    status = StringField('Status', [validators.Length(min=1, max=1)])
+    capacity = StringField('Capacity', [validators.Length(min=1, max=2)])
+
+
+@app.route('/add_room', methods=['GET', 'POST'])
+@is_logged_in
+def add_room():
+    form = RoomForm()
+
+    if request.method == 'POST':
+        id = form.id.data
+        number = form.number.data
+        type = form.type.data
+        status = form.status.data
+        capacity = form.capacity.data
+
+        cur = mysql.connection.cursor()
+
+        cur.execute("INSERT INTO rooms(r_id, r_number, r_type, r_capacity, r_status) VALUES(%s, %s, %s, %s, %s)", (id, number, type, capacity, status))
+
+        mysql.connection.commit()
+
+        cur.close()
+
+        flash('Room Added Successfully!', 'success')
+
+        return redirect(url_for('add_room'))
+
+    return render_template('add_room.html', form=form)
+
+@app.route('/edit_room/<string:id>', methods=['GET', 'POST'])
+@is_logged_in
+def edit_room(id):
+    cur = mysql.connection.cursor()
+
+    result = cur.execute("SELECT * FROM rooms WHERE r_id=%s", [id])
+
+    article = cur.fetchone()
+
+    form = RoomForm()
+
+    form.type.data = article['r_type']
+    form.status.data = article['r_status']
+    form.capacity.data = article['r_capacity']
+
+    if request.method=='POST':#form.validate_on_submit():
+        type = request.form['type']
+        status = request.form['status']
+        capacity = request.form['capacity']
+
+        cur = mysql.connection.cursor()
+
+        cur.execute("UPDATE rooms SET r_type=%s, r_status=%s, r_capacity=%s WHERE r_id=%s", (type, status, capacity, id))
+
+        mysql.connection.commit()
+
+        cur.close()
+
+        flash('Room Updated successfully', 'success')
+
+        return redirect(url_for('edit_room', id=id))
+
+    return render_template('edit_room.html', form=form, id=id)
+
+@app.route('/delete_room/<string:id>', methods=['GET', 'POST'])
+@is_logged_in
+def delete_room(id):
+    cur=mysql.connection.cursor()
+
+    cur.execute("DELETE FROM rooms WHERE r_id=%s", [id])
+
+    mysql.connection.commit()
+
+    cur.close()
+
+    flash('Room Deleted', 'success')
+
+    return redirect(url_for('admin_rooms'))
+
+class DateForm(Form):
+    dt = DateField('Pick a Date', format="%m/%d/%Y")
+
+
+@app.route('/date', methods=['post','get'])
+def home():
+    form = DateForm()
+    if form.validate_on_submit():
+        print(form.dt.data)
+        return form.dt.data.strftime('%Y-%m-%d')
+    return render_template('example.html', form=form)
+
+class BookingForm(Form):
+    check_in = DateField('Pick a Date', format="%m/%d/%Y")
+    check_out = DateField('Pick a Date', format="%m/%d/%Y")
+    status = StringField('Status', [validators.Length(min=1, max=1)])
+    name = StringField('Name', [validators.Length(min=3, max=30)])
+    count = StringField('No of adults', [validators.Length(min=1, max=1)])
+    email = StringField('Email', [validators.Length(min=2, max=200)])
+    streetno = TextAreaField('Street Address', [validators.Length(min=6)])
+    city = StringField('City', [validators.Length(min=2, max=200)])
+    state = StringField('State', [validators.Length(min=2, max=200)])    
+    country = StringField('Country', [validators.Length(min=2, max=20)])
+    pincode = StringField('Pincode', [validators.Length(min=6, max=6)])
+
+
+
+@app.route('/bookings/<string:id>', methods=['GET', 'POST'])
+def bookings(id):
+    global x, g_id, b_id
+    x = 1
+    g_id = random.randint(1, 1000)
+    b_id = random.randint(1001, 10000)
+
+    cur = mysql.connection.cursor()
+    
+    result = cur.execute("SELECT * FROM amenities WHERE a_id=%s", [id])
+    amenity = cur.fetchone()
+
+    form = BookingForm()
+
+    if form.validate_on_submit():
+        
+        check_in = form.check_in.data.strftime('%Y-%m-%d')
+        check_out = form.check_out.data
+        status = form.status.data
+        name = form.name.data
+        count = form.count.data
+        email = form.email.data
+        streetno = form.streetno.data
+        city = form.city.data
+        state = form.state.data    
+        country = form.country.data
+        pincode = form.pincode.data
+        print("hello "+check_in)
+
+
+        if id[0] == 'R':
+            cur.execute("INSERT INTO bookings(b_id, r_id, g_id, b_status, a_id, st, et) VALUES(%s, %s, %s, %s, %s, %s, %s)", (b_id, id, g_id, status, '0', check_in, check_out))
+        else:
+            cur.execute("INSERT INTO bookings(b_id, r_id, g_id, b_status, a_id, st, et) VALUES(%s, %s, %s, %s, %s, %s, %s)", (b_id, '0', g_id, status, id, check_in, check_out))
+
+        cur.execute("INSERT INTO guests(g_id, g_name, g_email, g_count, g_streetno, g_city, g_state, g_country, g_pincode) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)",(g_id, name, email, count, streetno, city, state, country, pincode))
+
+        mysql.connection.commit()
+
+        cur.close()
+
+        flash('Successfully Booked!', 'success')
+
+        return redirect(url_for('bookings'))
+
+    return render_template('bookings.html', amenity=amenity, form=form)  
+
+@app.route('/<name>/<location>')
+def pdf_template(name, location):
+    rendered = render_template('pdf_template.html', name=name, location=location)
+    pdf = pdfkit.from_string(rendered, False)
+
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=output.pdf'
+
+    account_sid = 'AC4813fd548f065ee195b1aa2feb96c58f' # Found on Twilio Console Dashboard
+    auth_token = 'cda8141ecc84ab6ae0489aacab4d3586' # Found on Twilio Console Dashboard
+    myPhone = '+918130733945' # Phone number you used to verify your Twilio account
+    TwilioNumber = '+12692206694' # Phone number given to you by Twilio
+    client = Client(account_sid, auth_token)
+
+    client.messages.create(
+        to=myPhone,
+        from_=TwilioNumber,
+        body='I sent a text message from twilio! ' + u'\U0001f680')
+
+
+    return response
+
 
 if __name__ == '__main__':
 	app.secret_key = 'xyzapp123'
-	app.run()
+	app.run(debug = True)
