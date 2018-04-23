@@ -33,17 +33,19 @@
 		{% endif %}
 	</p></small>
 
-	<small><p style="display: inline">	<strong>Status:</strong>
+	<!--small><p style="display: inline">	<strong>Status:</strong>
 		{% if id[0] == 'R' %}
 		{{amenity.r_status}}
 		{% else %}
 		{{amenity.a_status}}
 		{% endif %}
-	</p></small>
+	</p></small-->
 
 	<hr>
 	{% from "includes/_formhelpers.html" import render_field %}
 	<form method="post" action="">
+
+		{% if id[0] == 'R' %}
 		<p style="display: inline">Check-in &nbsp;</p>
 		{{ form.hidden_tag() }}
 		{{ form.check_in(class='dtpick') }}
@@ -56,21 +58,35 @@
 		
 		<br><br>
 
+		{% else %}
+		&nbsp; &nbsp;<p style="display: inline">Date &nbsp;</p>
+		{{ form.hidden_tag() }}
+		{{ form.check_in(class='dtpick') }}
+		
+		<br><br>
+		{% endif %}
 
-		<div class="form-group">
-			{{render_field(form.status, class_="form-control")}}
+		{% if id[0] != 'R' %}
+		<div class="form-group col-lg-3">
+			{{render_field(form.g_id, class_="form-control")}}
+		</div>	
+
+		<div class="form-group col-lg-3">
+			{{render_field(form.count, class_="form-control")}}
 		</div>
 
-		<div class="form-group">
+		{% else %}
+
+		<div class="form-group col-lg-3">
 			{{render_field(form.name, class_="form-control")}}
 		</div>	
 
 
-		<div class="form-group">
+		<div class="form-group col-lg-3">
 			{{render_field(form.count, class_="form-control")}}
 		</div>
 
-		<div class="form-group">
+		<div class="form-group col-lg-5">
 			{{render_field(form.email, class_="form-control")}}
 		</div>
 
@@ -78,7 +94,7 @@
 			{{render_field(form.streetno, class_="form-control", id="editor")}}
 		</div>
 
-		<div class="form-group">
+		<div class="form-group col-lg-3">
 			{{render_field(form.city, class_="form-control")}}
 		</div>
 
@@ -103,11 +119,12 @@
 	populateCountries("country2");
 	</script>
 
-		<div class="form-group">
+		<div class="form-group col-lg-3">
 			{{render_field(form.pincode, class_="form-control")}}
 		</div>
 
 		<p><input type="submit" class="btn btn-primary" value="Book"></p>
 	</form>
+	{% endif %}
 
 {% endblock %}

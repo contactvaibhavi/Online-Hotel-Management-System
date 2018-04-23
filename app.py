@@ -410,9 +410,10 @@ def home():
     return render_template('example.html', form=form)
 
 class BookingForm(Form):
+    g_id = StringField('Enter your unique Guest ID')
     check_in = DateField('Pick a Date', format="%m/%d/%Y")
     check_out = DateField('Pick a Date', format="%m/%d/%Y")
-    status = StringField('Status', [validators.Length(min=1, max=1)])
+    status = StringField('Status')
     name = StringField('Name', [validators.Length(min=3, max=30)])
     count = StringField('No of adults', [validators.Length(min=1, max=1)])
     email = StringField('Email', [validators.Length(min=2, max=200)])
@@ -428,7 +429,6 @@ class BookingForm(Form):
 def bookings(id):
     global x, g_id, b_id
     x = 1
-    g_id = random.randint(1, 1000)
     b_id = random.randint(1001, 10000)
 
     cur = mysql.connection.cursor()
@@ -441,12 +441,19 @@ def bookings(id):
     amenity = cur.fetchone()
 
     form = BookingForm()
-
+    print("HERE2")
     if form.validate_on_submit():
-        
+        print("HERE0")
         check_in = form.check_in.data.strftime('%Y-%m-%d')
-        check_out = form.check_out.data
-        status = form.status.data
+        if id[0] == 'R':
+            g_id = random.randint(1, 1000)
+            check_out = form.check_out.data
+        else:
+            g_id = form.g_id.data
+            print("gid is %s", [g_id])
+            check_out = check_in
+
+        status = 1
         name = form.name.data
         count = form.count.data
         email = form.email.data
@@ -460,11 +467,10 @@ def bookings(id):
 
         if id[0] == 'R':
             cur.execute("INSERT INTO bookings(b_id, r_id, g_id, b_status, a_id, st, et) VALUES(%s, %s, %s, %s, %s, %s, %s)", (b_id, id, g_id, status, '0', check_in, check_out))
+            cur.execute("INSERT INTO guests(g_id, g_name, g_email, g_count, g_streetno, g_city, g_state, g_country, g_pincode) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)",(g_id, name, email, count, streetno, city, state, country, pincode))
         else:
             cur.execute("INSERT INTO bookings(b_id, r_id, g_id, b_status, a_id, st, et) VALUES(%s, %s, %s, %s, %s, %s, %s)", (b_id, '0', g_id, status, id, check_in, check_out))
-
-        cur.execute("INSERT INTO guests(g_id, g_name, g_email, g_count, g_streetno, g_city, g_state, g_country, g_pincode) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)",(g_id, name, email, count, streetno, city, state, country, pincode))
-
+        
         mysql.connection.commit()
 
         cur.close()
@@ -507,12 +513,22 @@ def generate_bill(id):
 
     guest = cur.fetchone()
 
-    rendered = render_template('generate_bill.html', guest=guest, bookings=bookings)
+    result = cur.execute("SELECT cost FROM charges c WHERE (c.type = (SELECT r_type FROM rooms r, bookings b2 WHERE r.r_id = b2.r_id AND b2.g_id = %s) AND code = 0) OR (c.type = (SELECT a_type FROM amenities a, bookings b2 WHERE a.a_id = b2.a_id AND b2.g_id = %s) AND code = 1)", (id, id))
+
+    costs = cur.fetchall()
+
+    print(costs)
+    print(len(bookings))
+    result = cur.execute("SELECT sum(cost) as total FROM charges c WHERE (c.type = (SELECT r_type FROM rooms r, bookings b2 WHERE r.r_id = b2.r_id AND b2.g_id = %s) AND code = 0) OR (c.type = (SELECT a_type FROM amenities a, bookings b2 WHERE a.a_id = b2.a_id AND b2.g_id = %s) AND code = 1)", (id, id))
+
+    total = cur.fetchone()
+
+    rendered = render_template('generate_bill.html', len=len(bookings), guest=guest, bookings=bookings, costs=costs, total=total)
     pdf = pdfkit.from_string(rendered, False)
 
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'inline; filename=output.pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=Bill.pdf'
 
     return response
 
