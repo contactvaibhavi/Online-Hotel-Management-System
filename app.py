@@ -88,8 +88,9 @@ class RegisterForm(Form):
 # User Register
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegisterForm(request.form)
-    if request.method == 'POST' and form.validate():
+    form = RegisterForm()
+    if 1:
+        print("hereeee")
         name = form.name.data
         email = form.email.data
         username = form.username.data
@@ -219,10 +220,12 @@ class AmenityForm(Form):
 @app.route('/add_amenity', methods=['GET', 'POST'])
 @is_logged_in
 def add_amenity():
-    form = AmenityForm(request.form)
+    form = AmenityForm()
 
-    if request.method == 'POST' and form.validate():
-        id = form.id.data
+    if 1:#form.validate_on_submit():
+        print("YES")
+        idd = form.id.data
+        print(idd)
         type = form.type.data
         status = form.status.data
         capacity = form.capacity.data
@@ -231,7 +234,7 @@ def add_amenity():
 
         cur = mysql.connection.cursor()
 
-        cur.execute("INSERT INTO amenities(a_id, a_type, a_status, a_capacity, a_title, a_description) VALUES(%s, %s, %s, %s, %s, %s)", (id, type, status, capacity, title, description))
+        cur.execute("INSERT INTO amenities(a_id, a_type, a_status, a_capacity, a_title, a_description) VALUES(%s, %s, %s, %s, %s, %s)", (idd, type, status, capacity, title, description))
 
         mysql.connection.commit()
 
@@ -252,7 +255,7 @@ def edit_amenity(id):
 
     article = cur.fetchone()
 
-    form = AmenityForm(request.form)
+    form = AmenityForm()
 
     form.type.data = article['a_type']
     form.status.data = article['a_status']
@@ -260,7 +263,7 @@ def edit_amenity(id):
     form.title.data = article['a_title']
     form.description.data  = article['a_description']
 
-    if request.method == 'POST' and form.validate():
+    if 1:#form.validate_on_submit():
         type = request.form['type']
         status = request.form['status']
         capacity = request.form['capacity']
@@ -277,7 +280,7 @@ def edit_amenity(id):
 
         flash('Facility Updated successfully', 'success')
 
-        return redirect(url_for('edit_amenity'))
+        return redirect(url_for('dashboard'))
 
     return render_template('edit_amenity.html', form=form)
 
@@ -427,8 +430,7 @@ class BookingForm(Form):
 
 @app.route('/bookings/<string:id>', methods=['GET', 'POST'])
 def bookings(id):
-    global x, g_id, b_id
-    x = 1
+    global g_id, b_id
     b_id = random.randint(1001, 10000)
 
     cur = mysql.connection.cursor()
@@ -440,17 +442,45 @@ def bookings(id):
     
     amenity = cur.fetchone()
 
+    if id[0] == 'R' and amenity['r_status'] == 1:
+        return redirect(url_for('rooms'))
+
+    if id[0] != 'R' and amenity['a_status'] == 1:
+        return redirect(url_for('amenities'))
+
     form = BookingForm()
     print("HERE2")
-    if form.validate_on_submit():
+    if request.method=='POST':#form.g_id.validate_on_submit():
         print("HERE0")
         check_in = form.check_in.data.strftime('%Y-%m-%d')
+        print(check_in)
         if id[0] == 'R':
             g_id = random.randint(1, 1000)
+
+            result = cur.execute("SELECT r_type FROM rooms WHERE r_id=%s",[id])
+            result = cur.fetchone()
+            f_type = result['r_type']
+
+            result = cur.execute("SELECT cost FROM charges WHERE code = 1 AND type=%s",[f_type])
+            result = cur.fetchone()
+            f_cost = result['cost']
+
+            print(f_type, f_cost)
+            
             check_out = form.check_out.data
         else:
             g_id = form.g_id.data
-            print("gid is %s", [g_id])
+            
+            result = cur.execute("SELECT a_type FROM amenities WHERE a_id=%s",[id])
+            result = cur.fetchone()
+            f_type = result['a_type']
+
+            result = cur.execute("SELECT cost FROM charges WHERE code = 0 AND type=%s",[f_type])
+            result = cur.fetchone()
+            f_cost = result['cost']
+
+            print(f_type, f_cost)
+            
             check_out = check_in
 
         status = 1
@@ -462,14 +492,15 @@ def bookings(id):
         state = form.state.data    
         country = form.country.data
         pincode = form.pincode.data
+
         print("hello "+check_in)
 
 
         if id[0] == 'R':
-            cur.execute("INSERT INTO bookings(b_id, r_id, g_id, b_status, a_id, st, et) VALUES(%s, %s, %s, %s, %s, %s, %s)", (b_id, id, g_id, status, '0', check_in, check_out))
+            cur.execute("INSERT INTO bookings(b_id, r_id, g_id, b_status, a_id, st, et, f_type, f_cost) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)", (b_id, id, g_id, status, '0', check_in, check_out, f_type, f_cost))
             cur.execute("INSERT INTO guests(g_id, g_name, g_email, g_count, g_streetno, g_city, g_state, g_country, g_pincode) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)",(g_id, name, email, count, streetno, city, state, country, pincode))
         else:
-            cur.execute("INSERT INTO bookings(b_id, r_id, g_id, b_status, a_id, st, et) VALUES(%s, %s, %s, %s, %s, %s, %s)", (b_id, '0', g_id, status, id, check_in, check_out))
+            cur.execute("INSERT INTO bookings(b_id, r_id, g_id, b_status, a_id, st, et, f_type, f_cost) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)", (b_id, '0', g_id, status, id, check_in, check_out, f_type, f_cost))
         
         mysql.connection.commit()
 
@@ -513,17 +544,23 @@ def generate_bill(id):
 
     guest = cur.fetchone()
 
-    result = cur.execute("SELECT cost FROM charges c WHERE (c.type = (SELECT r_type FROM rooms r, bookings b2 WHERE r.r_id = b2.r_id AND b2.g_id = %s) AND code = 0) OR (c.type = (SELECT a_type FROM amenities a, bookings b2 WHERE a.a_id = b2.a_id AND b2.g_id = %s) AND code = 1)", (id, id))
+    #result = cur.execute("SELECT cost FROM charges c WHERE (c.type = (SELECT r_type FROM rooms r, bookings b2 WHERE r.r_id = b2.r_id AND b2.g_id = %s) AND code = 0) OR (c.type = (SELECT a_type FROM amenities a, bookings b2 WHERE a.a_id = b2.a_id AND b2.g_id = %s) AND code = 1)", (id, id))
 
-    costs = cur.fetchall()
+    #costs = cur.fetchall()
 
-    print(costs)
-    print(len(bookings))
-    result = cur.execute("SELECT sum(cost) as total FROM charges c WHERE (c.type = (SELECT r_type FROM rooms r, bookings b2 WHERE r.r_id = b2.r_id AND b2.g_id = %s) AND code = 0) OR (c.type = (SELECT a_type FROM amenities a, bookings b2 WHERE a.a_id = b2.a_id AND b2.g_id = %s) AND code = 1)", (id, id))
+    #print(costs)
+    #print(len(bookings))
 
-    total = cur.fetchone()
+    #result = cur.execute("SELECT sum(cost) as total FROM charges c WHERE (c.type = (SELECT r_type FROM rooms r, bookings b2 WHERE r.r_id = b2.r_id AND b2.g_id = %s) AND code = 0) OR (c.type = (SELECT a_type FROM amenities a, bookings b2 WHERE a.a_id = b2.a_id AND b2.g_id = %s) AND code = 1)", (id, id))
 
-    rendered = render_template('generate_bill.html', len=len(bookings), guest=guest, bookings=bookings, costs=costs, total=total)
+    #total = cur.fetchone()
+
+    total = 0
+
+    for i in range(0, len(bookings)):
+        total += bookings[i]['f_cost']
+
+    rendered = render_template('generate_bill.html', len=len(bookings), guest=guest, bookings=bookings, total=total)
     pdf = pdfkit.from_string(rendered, False)
 
     response = make_response(pdf)

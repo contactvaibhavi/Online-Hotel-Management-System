@@ -108,6 +108,10 @@
 			{{ form.state(id='state') }}
 		</select>
 
+		<div class="form-group col-lg-3">
+			{{render_field(form.pincode, class_="form-control")}}
+		</div>
+	{% endif %}
 		<!--div>
 	Country   <select id="country" name ="country"></select> </br></br>
 	State <select name ="state" id ="state"></select> 
@@ -119,12 +123,10 @@
 	populateCountries("country2");
 	</script>
 
-		<div class="form-group col-lg-3">
-			{{render_field(form.pincode, class_="form-control")}}
-		</div>
+		
 
 		<p><input type="submit" class="btn btn-primary" value="Book"></p>
 	</form>
-	{% endif %}
+	
 
 {% endblock %}

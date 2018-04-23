@@ -14,6 +14,7 @@
 			<th>Amenity ID</th>
 			<th>Check In Date</th>
 			<th>Check Out Date</th>
+			<th>Type</th>
 			<th>Charges</th>
 
 		</tr>
@@ -36,13 +37,13 @@
 
 			<td>{{bookings[i].st}}</td>
 			<td>{{bookings[i].et}}</td>
-			
-			<td>{{costs[i].cost}}</td>
+			<td>{{bookings[i].f_type}}</td>
+			<td>{{bookings[i].f_cost}}</td>
 			{% endfor %}
 
 		</tr>
 		
 	</table>
-    <p style="text-align: right;"><strong>Total Charges: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>{{total.total}}&emsp;&emsp;&emsp;&emsp;</p>
+    <p style="text-align: right;"><strong>Total Charges: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>{{total}}&emsp;&emsp;&emsp;&emsp;</p>
 
 {% endblock %}
