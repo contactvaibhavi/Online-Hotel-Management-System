@@ -9,6 +9,6 @@ It also supports Admin privileges through an admin console with the control to c
 
 ![alt text](/ERDiagramHotelManagement.png)
 
-#### Built with:
+#### Built with
 
-Flask, Python, ngrok library for Local web Tunnelling and debugging., Javascript, MySQL etc.
+Flask, Python, ngrok library for Local web Tunnelling and debugging, Javascript, CSS, HTML, MySQL etc.
