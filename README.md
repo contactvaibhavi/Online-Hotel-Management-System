@@ -9,6 +9,6 @@ It also supports Admin privileges through an admin console with the control to c
 
 ![alt text](/ERDiagramHotelManagement.png)
 
-#### Technologies Used:
+#### Built with:
 
-Flask- a microframework in Python, ngrok library for local testing, Javascript, MySQL etc.
+Flask, Python, ngrok library for Local web Tunnelling and debugging., Javascript, MySQL etc.
