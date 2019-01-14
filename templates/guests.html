@@ -18,17 +18,17 @@
 		
 		{% for guest in guests %}
 		<tr>
-			<td>{{guest.g_id}}</td>
-			<td>{{guest.g_name}}</td>
-			<td>{{guest.g_email}}</td>
-			<td>{{guest.g_count}}</td>
-			<td>{{guest.g_streetno | safe}}</td>
-			<td>{{guest.g_city}}</td>
-			<td>{{guest.g_state}}</td>
-			<td>{{guest.g_country}}</td>
-			<td>{{guest.g_pincode}}</td>
+			<td style ="word-break:break-all;"><font size="2">{{guest.g_id}}</td>
+			<td style ="word-break:break-all;"><font size="1">{{guest.g_name}}</td>
+			<td style ="word-break:break-all;"><font size="2">{{guest.g_email}}</td>
+			<td style ="word-break:break-all;"><font size="2">{{guest.g_count}}</td>
+			<td style ="word-break:break-all;"><font size="1">{{guest.g_streetno | safe}}</td>
+			<td style ="word-break:break-all;"><font size="1">{{guest.g_city}}</td>
+			<td style ="word-break:break-all;"><font size="1">{{guest.g_state}}</td>
+			<td style ="word-break:break-all;"><font size="1">{{guest.g_country}}</td>
+			<td style ="word-break:break-all;"><font size="1">{{guest.g_pincode}}</td>
 
-			<td><a href="view_bookings/{{guest.g_id}}" class="btn btn-success" method="POST">    View Bookings     </a></td>
+			<td style ="word-break:break-all;"><font size="1"><a href="view_bookings/{{guest.g_id}}" class="btn btn-success" method="POST">    View Bookings     </a></td>
 
 		</tr>
 		{% endfor %}

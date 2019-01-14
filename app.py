@@ -8,6 +8,8 @@ from functools import wraps
 import pdfkit
 from twilio.rest import Client
 from datetime import date
+import os
+
 
 app = Flask(__name__)
 
@@ -89,7 +91,8 @@ class RegisterForm(Form):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
-    if 1:
+    print("YAYAYA")
+    if 0:
         print("hereeee")
         name = form.name.data
         email = form.email.data
@@ -209,10 +212,10 @@ def admin_amenities():
     return render_template('admin_amenities.html')
 
 class AmenityForm(Form):
-    id = StringField('ID', [validators.Length(min=3, max=5)])
-    type = StringField('Type', [validators.Length(min=1, max=1)])
-    status = StringField('Status', [validators.Length(min=1, max=1)])
-    capacity = StringField('Capacity', [validators.Length(min=3, max=5)])
+    id = StringField('ID', [validators.Length(min=0, max=5)])
+    type = StringField('Type', [validators.Length(min=0, max=1)])
+    status = StringField('Status', [validators.Length(min=0, max=1)])
+    capacity = StringField('Capacity', [validators.Length(min=0, max=5)])
     title = StringField('Title', [validators.Length(min=2, max=200)])
     description = TextAreaField('Description', [validators.Length(min=30)])
 
@@ -222,7 +225,7 @@ class AmenityForm(Form):
 def add_amenity():
     form = AmenityForm()
 
-    if 1:#form.validate_on_submit():
+    if form.validate_on_submit():
         print("YES")
         idd = form.id.data
         print(idd)
@@ -243,27 +246,29 @@ def add_amenity():
         flash('Facility Added Successfully', 'success')
 
         return redirect(url_for('add_amenity'))
-
+    print(form.errors)
     return render_template('add_amenity.html', form=form)
 
 @app.route('/edit_amenity/<string:id>', methods=['GET', 'POST'])
 @is_logged_in
 def edit_amenity(id):
+    print("&&&&&FFGTHTRH")
     cur = mysql.connection.cursor()
 
     result = cur.execute("SELECT * FROM amenities WHERE a_id=%s", [id])
-
-    article = cur.fetchone()
-
+    print(result)
+    amenity = cur.fetchone()
+    print(amenity)
     form = AmenityForm()
+    print(form)
 
-    form.type.data = article['a_type']
-    form.status.data = article['a_status']
-    form.capacity.data = article['a_capacity']
-    form.title.data = article['a_title']
-    form.description.data  = article['a_description']
+    form.type.data = str(amenity['a_type'])
+    form.status.data = str(amenity['a_status'])
+    form.capacity.data = str(amenity['a_capacity'])
+    form.title.data = str(amenity['a_title'])
+    form.description.data  = amenity['a_description']
 
-    if 1:#form.validate_on_submit():
+    if form.validate_on_submit():
         type = request.form['type']
         status = request.form['status']
         capacity = request.form['capacity']
@@ -282,6 +287,7 @@ def edit_amenity(id):
 
         return redirect(url_for('dashboard'))
 
+    print(form.errors)
     return render_template('edit_amenity.html', form=form)
 
 @app.route('/delete_amenity/<string:id>', methods=['GET', 'POST'])
@@ -581,5 +587,12 @@ def billings():
     return render_template('billings.html', form=form)
 
 if __name__ == '__main__':
-	app.secret_key = 'xyzapp123'
-	app.run(debug = True)
+    SECRET_KEY = os.urandom(32)
+    app.config['SECRET_KEY'] = SECRET_KEY
+
+    print(SECRET_KEY)
+
+    SECRET_KEY = os.urandom(32)
+    app.config['WTF_CSRF_SECRET_KEY']=SECRET_KEY
+
+    app.run(debug = True)

@@ -5,6 +5,7 @@
 
 	{% from "includes/_formhelpers.html" import render_field %}
 	<form method="POST" action="">
+		{{form.csrf_token}}
 		<div class="form-group">
 			{{render_field(form.id, class_="form-control")}}
 		</div>
