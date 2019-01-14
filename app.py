@@ -580,30 +580,6 @@ def billings():
         return redirect(url_for('generate_bill', id=id))
     return render_template('billings.html', form=form)
 
-
-@app.route('/<name>/<location>')
-def pdf_template(name, location):
-    rendered = render_template('pdf_template.html', name=name, location=location)
-    pdf = pdfkit.from_string(rendered, False)
-
-    response = make_response(pdf)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'inline; filename=output.pdf'
-
-    account_sid = 'AC4813fd548f065ee195b1aa2feb96c58f' # Found on Twilio Console Dashboard
-    auth_token = 'cda8141ecc84ab6ae0489aacab4d3586' # Found on Twilio Console Dashboard
-    myPhone = '+918130733945' # Phone number you used to verify your Twilio account
-    TwilioNumber = '+12692206694' # Phone number given to you by Twilio
-    client = Client(account_sid, auth_token)
-
-    client.messages.create(
-        to=myPhone,
-        from_=TwilioNumber,
-        body='I sent a text message from twilio! ' + u'\U0001f680')
-
-    return response
-
-
 if __name__ == '__main__':
 	app.secret_key = 'xyzapp123'
 	app.run(debug = True)
