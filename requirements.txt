@@ -233,7 +233,7 @@ tables==3.4.2
 tblib==1.3.2
 template-remover==0.1.9
 tensorboard==1.10.0
-tensorflow==1.10.0
+tensorflow==1.15.0
 termcolor==1.1.0
 terminado==0.8.1
 testpath==0.3.1
