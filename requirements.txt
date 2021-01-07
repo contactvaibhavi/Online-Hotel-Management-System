@@ -114,7 +114,7 @@ libclang-py3==3.4.0
 librosa==0.6.0
 llvmlite==0.21.0
 locket==0.2.0
-lxml==4.1.1
+lxml==4.6.2
 Mako==1.0.7
 mando==0.3.3
 Markdown==2.6.11
