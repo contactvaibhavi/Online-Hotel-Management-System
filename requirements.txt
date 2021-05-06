@@ -63,7 +63,7 @@ et-xmlfile==1.0.1
 fastcache==1.0.2
 filelock==2.0.13
 Flask==0.12.2
-Flask-Cors==3.0.3
+Flask-Cors==3.0.9
 flask-heroku==0.1.9
 Flask-MySQLdb==0.2.0
 Flask-SQLAlchemy==2.3.2
