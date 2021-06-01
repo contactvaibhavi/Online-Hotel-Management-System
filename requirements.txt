@@ -246,7 +246,7 @@ Twisted==18.7.0
 typing==3.6.2
 unicodecsv==0.14.1
 unidiff==0.5.5
-urllib3==1.23
+urllib3==1.26.5
 virtualenv==15.2.0
 virtualenv-clone==0.3.0
 vulture==0.10
