@@ -14,7 +14,7 @@ audioread==2.1.4
 autoflake==0.6.6
 Automat==0.7.0
 autopep8==1.4.3
-Babel==2.5.3
+Babel==2.9.1
 backports.shutil-get-terminal-size==1.0.0
 bandit==1.5.1
 beautifulsoup4==4.6.3
