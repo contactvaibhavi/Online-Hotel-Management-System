@@ -203,7 +203,7 @@ radon==1.4.0
 requests==2.19.1
 resampy==0.2.0
 restructuredtext-lint==1.0.1
-rope==0.10.7
+rope==0.11.0
 rstcheck==2.2
 ruamel-yaml==0.15.46
 safety==0.5.1
