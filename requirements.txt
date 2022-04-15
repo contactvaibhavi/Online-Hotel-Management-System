@@ -49,7 +49,7 @@ cryptography-vectors==2.3
 cycler==0.10.0
 Cython==0.27.3
 cytoolz==0.9.0
-dask==0.16.1
+dask==2021.10.0
 datashape==0.5.4
 decorator==4.3.0
 dennis==0.9
