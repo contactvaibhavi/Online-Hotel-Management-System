@@ -206,7 +206,7 @@ restructuredtext-lint==1.0.1
 rope==0.11.0
 rstcheck==2.2
 ruamel-yaml==0.15.46
-safety==0.5.1
+safety==1.9.0
 sarge==0.1.5.post0
 scikit-image==0.13.1
 scikit-learn==0.19.1
