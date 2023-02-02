@@ -252,7 +252,7 @@ virtualenv-clone==0.3.0
 vulture==0.10
 wcwidth==0.1.7
 webencodings==0.5.1
-Werkzeug==0.15.3
+Werkzeug==0.15.5
 widgetsnbextension==3.1.0
 wrapt==1.10.11
 WTForms==2.2.1
