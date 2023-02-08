@@ -44,7 +44,7 @@ constantly==15.1.0
 contextlib2==0.5.5
 cppclean==0.12
 cpplint==1.3.0
-cryptography==3.3.2
+cryptography==39.0.1
 cryptography-vectors==2.3
 cycler==0.10.0
 Cython==0.27.3
