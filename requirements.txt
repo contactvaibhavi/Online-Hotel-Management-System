@@ -72,7 +72,7 @@ future==0.17.1
 gast==0.2.0
 gevent==1.2.2
 gitdb2==2.0.5
-GitPython==2.1.11
+GitPython==3.1.30
 glob2==0.6
 gmpy2==2.0.8
 greenlet==0.4.12
