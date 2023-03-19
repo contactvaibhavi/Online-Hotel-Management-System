@@ -68,7 +68,7 @@ flask-heroku==0.1.9
 Flask-MySQLdb==0.2.0
 Flask-SQLAlchemy==2.3.2
 Flask-WTF==0.14.2
-future==0.17.1
+future==0.18.3
 gast==0.2.0
 gevent==1.2.2
 gitdb2==2.0.5
