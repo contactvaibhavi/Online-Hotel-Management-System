@@ -62,7 +62,7 @@ eradicate==0.1.6
 et-xmlfile==1.0.1
 fastcache==1.0.2
 filelock==2.0.13
-Flask==1.0
+Flask==2.3.2
 Flask-Cors==3.0.9
 flask-heroku==0.1.9
 Flask-MySQLdb==0.2.0
