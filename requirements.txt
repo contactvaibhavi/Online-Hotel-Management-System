@@ -200,7 +200,7 @@ QtAwesome==0.4.4
 qtconsole==4.3.1
 QtPy==1.4.2
 radon==1.4.0
-requests==2.20.0
+requests==2.31.0
 resampy==0.2.0
 restructuredtext-lint==1.0.1
 rope==0.11.0
