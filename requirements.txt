@@ -1,4 +1,4 @@
-Flask==2.2.3
+Flask==2.2.5
 Flask_MySQLdb==1.0.1
 Flask_WTF==1.1.1
 passlib==1.7.4
