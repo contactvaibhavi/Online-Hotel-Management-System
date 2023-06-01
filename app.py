@@ -1,4 +1,5 @@
 from flask import Flask, render_template, make_response, flash, redirect, url_for, session, request, logging
+from flask_session import Session
 import random
 from flask_mysqldb import MySQL
 from flask_wtf import Form
@@ -6,12 +7,16 @@ from wtforms import DateField, StringField, TextAreaField, PasswordField, valida
 from passlib.hash import sha256_crypt
 from functools import wraps
 import pdfkit
-from twilio.rest import Client
+# from twilio.rest import Client
 from datetime import date
 import os
 
 
 app = Flask(__name__)
+
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "file"
+Session(app)
 
 # Config MySQL
 app.config['MYSQL_HOST'] = 'localhost'
@@ -91,12 +96,12 @@ class RegisterForm(Form):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
-    print("YAYAYA")
-    if 0:
-        print("hereeee")
+
+    if form.validate_on_submit():
         name = form.name.data
         email = form.email.data
         username = form.username.data
+
         password = sha256_crypt.encrypt(str(form.password.data))
 
         # Create cursor
@@ -117,16 +122,18 @@ def register():
         cur.close()
 
         flash('You are now registered and can log in', 'success')
-
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # If the Form is submitted
     if request.method == 'POST':
         # Get Form Fields
         username = request.form['username']
+        session['user_name'] = username
+
         password_candidate = request.form['password']
 
         # Create cursor
@@ -186,7 +193,7 @@ def is_logged_in(f):
 def logout():
     session.clear()
     flash('You are now logged out', 'success')
-    return redirect(url_for('login'))
+    return redirect('/')
 
 @app.route('/dashboard')
 @is_logged_in
