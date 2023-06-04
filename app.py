@@ -132,7 +132,7 @@ def login():
     if request.method == 'POST':
         # Get Form Fields
         username = request.form['username']
-        session['user_name'] = username
+        session['username'] = username
 
         password_candidate = request.form['password']
 
