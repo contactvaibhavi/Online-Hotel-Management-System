@@ -19,11 +19,12 @@ app.config["SESSION_TYPE"] = "file"
 Session(app)
 
 # Config MySQL
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'laser123'
-app.config['MYSQL_DB'] = 'hotel_mgmt'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+app.config['MYSQL_HOST'] = 'MYSQL_HOST'
+app.config['MYSQL_USER'] = 'MYSQL_USER'
+app.config['MYSQL_PASSWORD'] = 'MYSQL_PASSWORD'
+app.config['MYSQL_DB'] = 'MYSQL_DB'
+app.config['MYSQL_CURSORCLASS'] = 'MYSQL_CURSORCLASS'
+
 # init MYSQL
 mysql = MySQL(app)
 
@@ -95,9 +96,14 @@ class RegisterForm(Form):
 # User Register
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegisterForm()
+    # Call Parameterised Constructor to RegisterForm class 
+    # with the data collected from FrontEnd Request
+    form = RegisterForm(request.form)
 
-    if form.validate_on_submit():
+    
+    if request.method == 'POST' and form.validate():
+        print(form.name.data)
+        print(form.email.data)
         name = form.name.data
         email = form.email.data
         username = form.username.data
@@ -141,7 +147,6 @@ def login():
 
         # Get user by username
         result = cur.execute("SELECT * FROM admins WHERE username = %s", [username])
-
 
         if result > 0:
             # Get stored hash
