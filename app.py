@@ -1,5 +1,4 @@
 from flask import Flask, render_template, make_response, flash, redirect, url_for, session, request, logging
-from flask_session import Session
 import random
 from flask_mysqldb import MySQL
 from flask_wtf import Form
@@ -10,29 +9,31 @@ import pdfkit
 # from twilio.rest import Client
 from datetime import date
 import os
-
+from os import environ
 
 app = Flask(__name__)
-
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "file"
-Session(app)
+app.secret_key = os.urandom(32)
 
 # Config MySQL
-app.config['MYSQL_HOST'] = 'MYSQL_HOST'
-app.config['MYSQL_USER'] = 'MYSQL_USER'
-app.config['MYSQL_PASSWORD'] = 'MYSQL_PASSWORD'
-app.config['MYSQL_DB'] = 'MYSQL_DB'
-app.config['MYSQL_CURSORCLASS'] = 'MYSQL_CURSORCLASS'
+app.config['MYSQL_HOST'] = environ.get('MYSQL_HOST')
+app.config['MYSQL_USER'] = environ.get('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = environ.get('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = environ.get('MYSQL_DB')
+app.config['MYSQL_CURSORCLASS'] = environ.get('MYSQL_CURSORCLASS')
 
 # init MYSQL
 mysql = MySQL(app)
 
-#Articles = Articles()
-
 # Index
 @app.route('/')
 def index():
+    if session.get('secret_key'):
+        print(session['secret_key'])
+    else:
+        session['secret_key'] = os.urandom(32)
+    print("app.config['MYSQL_CURSORCLASS'] = "+ app.config['MYSQL_CURSORCLASS'])
+
+    cur = mysql.connection.cursor()
     return render_template('home.html')
 
 @app.route('/about')
@@ -161,6 +162,8 @@ def login():
                 #app.logger.info('PASSWORD MATCHED')
                 session['logged_in'] = True
                 session['username']  = username
+
+                # session['secret_key'] = SECRET_KEY
 
                 flash('Successfully logged in!', 'success')
 
@@ -346,9 +349,9 @@ class RoomForm(Form):
 @app.route('/add_room', methods=['GET', 'POST'])
 @is_logged_in
 def add_room():
-    form = RoomForm()
+    form = RoomForm(request.form)
 
-    if request.method == 'POST':
+    if request.method == 'POST' and form.validate():
         id = form.id.data
         number = form.number.data
         type = form.type.data
@@ -599,10 +602,12 @@ def billings():
     return render_template('billings.html', form=form)
 
 if __name__ == '__main__':
-    SECRET_KEY = os.urandom(32)
-    app.config['SECRET_KEY'] = SECRET_KEY
 
-    print(SECRET_KEY)
+    # SECRET_KEY = os.urandom(32)
+    # app.config['SECRET_KEY'] = SECRET_KEY
+
+    # app.config["SESSION_TYPE"] = "filesystem"
+    # Session(app)
 
     SECRET_KEY = os.urandom(32)
     app.config['WTF_CSRF_SECRET_KEY']=SECRET_KEY
