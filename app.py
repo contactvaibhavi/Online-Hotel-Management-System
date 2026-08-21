@@ -1,5 +1,6 @@
 from flask import Flask, render_template, make_response, flash, redirect, url_for, session, request, logging
 import random
+import re
 from flask_mysqldb import MySQL
 from flask_wtf import Form
 from wtforms import DateField, StringField, TextAreaField, PasswordField, validators
@@ -139,9 +140,15 @@ def login():
     if request.method == 'POST':
         # Get Form Fields
         username = request.form['username']
-        session['username'] = username
 
         password_candidate = request.form['password']
+
+        # Reject malformed usernames to defend against SQL injection
+        if not re.fullmatch(r"[A-Za-z0-9._ -]{1,25}", username):
+            error = 'Invalid login'
+            return render_template('login.html', error=error)
+
+        session['username'] = username
 
         # Create cursor
         cur = mysql.connection.cursor()
